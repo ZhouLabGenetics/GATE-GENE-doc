@@ -1,0 +1,8 @@
+# Build output. SAIGE-doc commits its _site/ directory; do not copy that.
+_site/
+.jekyll-cache/
+.jekyll-metadata
+Gemfile.lock
+vendor/
+.DS_Store
+.bundle/
