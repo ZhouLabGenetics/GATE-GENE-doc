@@ -17,7 +17,6 @@ GATE-GENE is developed in the [Zhou Lab](https://github.com/ZhouLabGenetics).
 | Docker image | `wzhou88/saigetest:1.5.2` |
 | Image digest | `sha256:db70848a657f0850ecc193255d46fc7cd15936616e2021a84e4d8496c5549948` |
 | Package version | 1.5.2 (`DESCRIPTION`, dated 2026-03-30) |
-| Licence | `DESCRIPTION` declares `GPL (>= 2)`; the GitHub repository reports GPL-3.0. [CONFIRM which is intended before release.] |
 | Issues | [GitHub issues](https://github.com/ZhouLabGenetics/GATE-GENE/issues) |
 
 {: .warning }

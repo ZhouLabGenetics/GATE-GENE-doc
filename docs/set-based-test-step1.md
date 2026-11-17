@@ -103,25 +103,42 @@ phecode event dates resolve to a month rather than a day.
 | `--sampleIDColinphenoFile` | `IID` | the ID column; must match the genotype files' sample IDs. Only needs setting if the column is not already named `IID`. |
 | `--LOCO` | `TRUE` | leave-one-chromosome-out. The bundled examples pass `FALSE`; what matters for a set-based exome scan is `--LOCO=FALSE` in **step 2**, since `TRUE` there would also require `--chrom`. |
 | `--minMAFforGRM` | `0.01` | MAF floor for markers entering the GRM. |
-| `--isCovariateOffset` | `TRUE` | changes which covariate design matrix step 1 stores for step 2 (`R/SAIGE_fitGLMM_fast.R:429-431`). See the note below. |
+| `--isCovariateOffset` | `TRUE` | **no effect on a survival run** — step 1 forces it to `FALSE`. See the note below. |
 | `--IsOverwriteVarianceRatioFile` | `FALSE` | set `TRUE` when re-running, or the existing file is kept. |
 | `--skipVarianceRatioEstimation` | `FALSE` | `TRUE` writes no `.varianceRatio.txt`. |
 | `--useSparseGRMtoFitNULL` | `FALSE` | fit the null model with the sparse GRM. |
 | `--useSparseGRMforVarRatio` | `FALSE` | also estimate a **sparse** variance ratio. Required if step 2 will be given the sparse GRM — see [Create sparse GRM]({{ site.baseurl }}/docs/create-sparse-grm/). |
 
 {: .note }
-> **`--isCovariateOffset` deserves a deliberate choice, and the source is ambiguous
-> about which way round it is.** The option is named as though `TRUE` means "treat the
-> covariates as an offset", but its help text reads *"Whether to estimate fixed effect
-> coeffciets. [default, 'TRUE']"*, which reads the other way. What is verifiable is that
-> the flag selects which covariate matrix is carried into step 2.
+> **`--isCovariateOffset` does nothing on a survival run.** Whatever you pass,
+> `fitNULLGLMM` overrides it to `FALSE` before it is used, as soon as it sees
+> `--traitType=survival` (`R/SAIGE_fitGLMM_fast.R:971-974`):
 >
-> The bundled examples are not consistent either: they pass `FALSE` for the full-GRM fit
-> and `TRUE` for the sparse-GRM fit. The commands on these pages follow the repository's
-> own examples rather than recommending one.
+> ```r
+> }else{
+>     isCovariateOffset = FALSE
+>     cat("trait type is survival. Covariates are not included as offset\n")
+> }
+> ```
 >
-> [CONFIRM before release: the intended meaning and the recommended value, and make the
-> bundled examples agree.]
+> Step 1 prints that line, so you can confirm it in your own log. The covariates in
+> `--covarColList` are estimated as fixed effects either way, and the `.rda` handed to
+> step 2 is the same. The examples here pass `--isCovariateOffset=FALSE` to match what
+> the run actually does; omitting it is equivalent.
+>
+> This is also why the bundled examples can pass `FALSE`
+> (`extdata/cmd_survival.sh:62`, `extdata/cmd.sh:177`) and `TRUE`
+> (`extdata/cmd_survival.sh:81`) for survival without disagreeing in behaviour.
+>
+> For binary and quantitative traits the option does apply, and the **option name is the
+> correct reading of it**: `TRUE` absorbs the covariates into an offset, refits the null
+> model as `pheno ~ 1`, and does not estimate their coefficients — step 1 prints
+> `isCovariateOffset=TRUE, so fixed effects coefficients won't be estimated.`
+> (`R/SAIGE_fitGLMM_fast.R:1397-1405`). The help text, *"Whether to estimate fixed effect
+> coeffciets. [default, 'TRUE']"*, states the opposite and is wrong. The defaults differ
+> between interfaces as well: `TRUE` from the command line
+> (`extdata/step1_fitNULLGLMM.R:120`) against `FALSE` in the R function
+> (`R/SAIGE_fitGLMM_fast.R:960`).
 
 ## Output
 
